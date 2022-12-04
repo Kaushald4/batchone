@@ -174,7 +174,7 @@ export const resetPassword = asyncHandler(async (req, res) => {
     if (!user) {
         throw new CustomError("password token is invalid or expired", 400);
     }
-
+    console.log(password, confirmPassword);
     if (password !== confirmPassword) {
         throw new CustomError("password and conf password does not match", 400);
     }
@@ -198,6 +198,47 @@ export const resetPassword = asyncHandler(async (req, res) => {
 });
 
 // TODO: create a controller for change password
+/******************************************************
+ * @GET_PROFILE
+ * @REQUEST_TYPE PUT
+ * @route http://localhost:5000/api/auth/password/change
+ * @description user will be able to change his password
+ * @parameters prevPassword, newPassword
+ * @returns successful message
+ ******************************************************/
+export const changePassword = asyncHandler(async (req, res) => {
+    const { prevPassword, newPassword, confirmNewPassword } = req.body;
+
+    if (!prevPassword || !newPassword || !confirmNewPassword) {
+        throw new CustomError("All fields are required!", 400);
+    }
+
+    const user = await User.findOne({ email: req.user.email }).select("+password");
+
+    if (!user) {
+        throw new CustomError("user not found", 400);
+    }
+
+    if (newPassword !== confirmNewPassword) {
+        throw new CustomError("password and conf password does not match", 400);
+    }
+
+    const isPasswordMatched = await user.comparePassword(prevPassword);
+
+    if (!isPasswordMatched) {
+        throw new CustomError("prev password is not valid!", 400);
+    }
+
+    user.password = newPassword;
+    await user.save();
+
+    user.password = undefined;
+
+    res.status(200).json({
+        success: true,
+        message: "password changed successfully",
+    });
+});
 
 /******************************************************
  * @GET_PROFILE
