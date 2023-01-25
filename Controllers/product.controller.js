@@ -1,10 +1,10 @@
 import Product from "../models/product.schema.js"
 import formidable from 'formidable';
+import Mongoose from "mongoose"
 import fs from "fs"
 import {deleteFile, s3FileUpload} from "../services/imageUpload.js"
-import Mongoose from "mongoose"
-import asyncHandler from '../services/asyncHandler'
-import CustomError from '../utils/customError'
+import asyncHandler from '../services/asyncHandler.js'
+import CustomError from '../utils/customError.js'
 import config from "../config/index.js"
 
 /**********************************************************
